@@ -69,7 +69,7 @@ export default async function Home() {
               <span className="text-sm font-medium">Step 1</span>
               <span className="text-xl font-semibold">Create an account.</span>
               <span className="mt-2 text-gray-400">
-                It's free!
+                It&apos;s free!
               </span>
             </div>
           </li>
