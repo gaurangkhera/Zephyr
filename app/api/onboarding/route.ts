@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 
 export const POST = async (req: NextRequest) => {
@@ -50,9 +50,9 @@ export const POST = async (req: NextRequest) => {
         }
     }
 
-    return new NextResponse("Onboarding successful", { status: 200 })
+    return new Response("Onboarding successful", { status: 200 })
     } catch (error){
-        return new NextResponse(`Onboarding failed with error: ${error}`, { status: 500 })
+        return new Response(`Onboarding failed with error: ${error}`, { status: 500 })
     }
     
 }
