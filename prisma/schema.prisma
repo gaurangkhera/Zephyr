@@ -1,0 +1,160 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum ProjectType {
+  REMOTE_WORK
+  FULL_TIME
+  PART_TIME
+}
+
+model User {
+  id                    String                 @id @default(cuid())
+  name                  String?
+  email                 String?                @unique
+  emailVerified         DateTime?
+  bio                   String?
+  experience            Int?
+  image                 String?
+  password              String?
+  occupation            String?
+  role                  UserRole               @default(USER)
+  accounts              Account[]
+  isTwoFactorEnabled    Boolean                @default(false)
+  twoFactorConfirmation TwoFactorConfirmation?
+  gigs                  Gig[]
+  orders                Order[]
+  sentMessages          Message[]              @relation("MessageSender")
+  receivedMessages      Message[]              @relation("MessageReceiver")
+  Project               Project[]
+  Applicant             Applicant[]
+  technologies          UserTechnology[]
+}
+
+model Technology {
+  id    String           @id @default(cuid())
+  name  String           @unique
+  users UserTechnology[]
+}
+
+model UserTechnology {
+  id           String     @id @default(cuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  technologyId String
+  technology   Technology @relation(fields: [technologyId], references: [id])
+}
+
+model Applicant {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+}
+
+model Project {
+  id          String      @id @default(cuid())
+  title       String
+  description String
+  minBudget   Float
+  maxBudget   Float
+  applicants  Applicant[]
+  type        ProjectType
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+}
+
+model Gig {
+  id          String  @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  userId      String
+  user        User    @relation(fields: [userId], references: [id])
+  orders      Order[]
+}
+
+model Order {
+  id            String @id @default(cuid())
+  gigId         String
+  gig           Gig    @relation(fields: [gigId], references: [id])
+  userId        String
+  user          User   @relation(fields: [userId], references: [id])
+  paymentStatus String
+}
+
+model Message {
+  id         String @id @default(cuid())
+  content    String
+  senderId   String
+  sender     User   @relation("MessageSender", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User   @relation("MessageReceiver", fields: [receiverId], references: [id])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorToken {
+  id      String   @id @default(cuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model TwoFactorConfirmation {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId])
+}
