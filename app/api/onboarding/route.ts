@@ -1,58 +1,45 @@
 import { NextRequest } from "next/server";
 import { db } from "@/lib/db";
 
-export const POST = async (req: NextRequest) => {
+export const POST = async (req: NextRequest): Promise<Response> => {
     try {
         const { userId, technologies, experience, occupation, bio } = await req.json();
-    const user = await db.user.findUnique({ where: { id: userId } });
+        const user = await db.user.findUnique({ where: { id: userId } });
 
-    if (!user) {
-        return {
-            status: 404,
-            json: { message: "User not found" },
-        };
-    }
-
-    await db.user.update({
-        where: { id: userId },
-        data: {
-            experience,
-            occupation,
-            bio
-        },
-    
-    })
-
-    for(let i = 0; i < technologies.length; i++) {
-        const technology = await db.technology.findUnique({ where: { name: technologies[i] } });
-        if (!technology) {
-            const newTech = await db.technology.create({
-                data: {
-                    name: technologies[i],
-                }
-            })
-
-            await db.userTechnology.create({
-                data: {
-                    technologyId: newTech.id,
-                    userId,
-                }
-            })
+        if (!user) {
+            return new Response(JSON.stringify({ message: "User not found" }), { status: 404 });
         }
 
-        if(technology){
+        await db.user.update({
+            where: { id: userId },
+            data: {
+                experience,
+                occupation,
+                bio
+            },
+        });
+
+        for (const tech of technologies) {
+            let technology = await db.technology.findUnique({ where: { name: tech } });
+
+            if (!technology) {
+                technology = await db.technology.create({
+                    data: {
+                        name: tech,
+                    }
+                });
+            }
+
             await db.userTechnology.create({
                 data: {
                     technologyId: technology.id,
                     userId,
                 }
-            })
+            });
         }
-    }
 
-    return new Response("Onboarding successful", { status: 200 })
-    } catch (error){
-        return new Response(`Onboarding failed with error: ${error}`, { status: 500 })
+        return new Response("Onboarding successful", { status: 200 });
+    } catch (error) {
+        return new Response(`Onboarding failed with error: ${error}`, { status: 500 });
     }
-    
 }
