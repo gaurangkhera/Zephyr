@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import ProjectFeed from "@/components/projects/project-feed";
-import Sidebar from "@/components/projects/sidebar";
 
 const page = async () => {
     const projects = await db.project.findMany({

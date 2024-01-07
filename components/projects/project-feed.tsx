@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import {
   Card,
   CardHeader,
@@ -211,7 +211,7 @@ const ProjectFeed = ({ projects }: ProjectFeedProps) => {
                   ${project.minBudget.toLocaleString()} - $
                   {project.maxBudget.toLocaleString()} ⋅{" "}
                   {project._count.applicants} applicants
-                  <Button size={"lg"}>Apply</Button>
+                  <Link href={`/projects/${project.id}/apply`} className={buttonVariants()}>Apply</Link>
                 </CardFooter>
               </Card>
             </Link>
