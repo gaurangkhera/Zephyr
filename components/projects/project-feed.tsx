@@ -35,12 +35,17 @@ interface Project {
 
 interface ProjectFeedProps {
   projects: Project[];
+  isDashboard: boolean;
 }
 
-const UserInfo = () => {
+const UserInfo = ({ isDashboard }: { isDashboard: boolean }) => {
   const user = useCurrentUser();
   return (
-    <div className="grid grid-rows-3 col-span-2 gap-4 h-full w-full">
+    <div
+      className={`grid grid-rows-3 col-span-2 gap-4 h-full w-full ${
+        isDashboard ? "hidden" : ""
+      }`}
+    >
       <Card className="row-span-1 overflow-auto">
         <CardContent className="flex flex-col items-center mt-8">
           {user ? (
@@ -54,7 +59,8 @@ const UserInfo = () => {
               />
               <CardTitle className="mt-4">{user.name}</CardTitle>
               <CardDescription className="text-gray-400">
-                {user.occupation} ⋅ {user.experience} {user.experience > 1 ? 'years' : 'year'} of experience
+                {user.occupation} ⋅ {user.experience}{" "}
+                {user.experience > 1 ? "years" : "year"} of experience
               </CardDescription>
               <Button className="mt-4">Edit profile</Button>
             </>
@@ -86,7 +92,7 @@ const UserInfo = () => {
   );
 };
 
-const ProjectFeed = ({ projects }: ProjectFeedProps) => {
+const ProjectFeed = ({ projects, isDashboard }: ProjectFeedProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isRemoteWork, setIsRemoteWork] = useState(false);
   const [isFullTime, setIsFullTime] = useState(false);
@@ -112,7 +118,7 @@ const ProjectFeed = ({ projects }: ProjectFeedProps) => {
 
   return (
     <div className="grid grid-cols-8 gap-4 p-2">
-      <Card className="h-[600px] col-span-2 overflow-auto">
+      <Card className="h-[600px] col-span-2 overflow-auto" hidden={isDashboard}>
         <CardHeader>
           <CardTitle>Filters</CardTitle>
           <CardDescription>
@@ -164,7 +170,7 @@ const ProjectFeed = ({ projects }: ProjectFeedProps) => {
         </CardFooter>
       </Card>
       <div className="col-span-4">
-        <Card className="mx-auto mb-4">
+        <Card className="mx-auto mb-4" hidden={isDashboard}>
           <CardHeader>
             <CardTitle className="text-2xl">Welcome to Zephyr.</CardTitle>
           </CardHeader>
@@ -211,14 +217,16 @@ const ProjectFeed = ({ projects }: ProjectFeedProps) => {
                   ${project.minBudget.toLocaleString()} - $
                   {project.maxBudget.toLocaleString()} ⋅{" "}
                   {project._count.applicants} applicants
-                  <Link href={`/projects/${project.id}/apply`} className={buttonVariants()}>Apply</Link>
+                  <Link href={`/projects/${project.id}/apply`} className={buttonVariants({
+                    size: 'lg'
+                  })}>Apply</Link>
                 </CardFooter>
               </Card>
             </Link>
           );
         })}
       </div>
-      <UserInfo />
+      <UserInfo isDashboard={isDashboard} />
     </div>
   );
 };

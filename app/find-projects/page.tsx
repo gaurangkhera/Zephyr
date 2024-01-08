@@ -1,5 +1,10 @@
 import { db } from "@/lib/db";
 import ProjectFeed from "@/components/projects/project-feed";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Find projects"
+}
 
 const page = async () => {
     const projects = await db.project.findMany({
@@ -13,7 +18,7 @@ const page = async () => {
     })
     return (
        <div className="w-full mt-4">
-         <ProjectFeed projects={projects} />
+         <ProjectFeed projects={projects} isDashboard={false} />
        </div>
     )
 }
