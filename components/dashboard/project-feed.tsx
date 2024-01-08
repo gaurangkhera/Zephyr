@@ -35,7 +35,7 @@ const DashboardProjectFeed = ({ projects }: ProjectFeedProps) => {
       <div className="col-span-4">
         {projects.map((project) => {
           return (
-            <Card className="mx-auto my-2">
+            <Card className="mx-auto my-2" key={project.id}>
               <CardHeader>
                 <div className="flex items-center">
                   <Image
